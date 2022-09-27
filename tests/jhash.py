@@ -51,6 +51,5 @@ if __name__ == "__main__":
         data = sys.stdin.buffer.read()
         print(compute(data))
         exit()
-    print(compute_state("1Jedimaster".encode(), 256))
-    data = input("Enter password for hash: ").encode()
+    data = input("Enter data to digest: ").encode()
     print(compute(data))
