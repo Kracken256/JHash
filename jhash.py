@@ -6,9 +6,11 @@ import sys
 
 def compute(raw_data:bytes, length=256,iterations=1,seed=0):
     data = list(raw_data)
-    # padding
+    # Derterminitic seed generation
     for i in data:
         seed = seed ^ i
+    
+    # padding
     if len(data) < length:
         t1 = length - len(data)
         data = data + [0] * t1
@@ -17,7 +19,7 @@ def compute(raw_data:bytes, length=256,iterations=1,seed=0):
         if t1 != 0:
             data = data + [0] * (length - t1)
     
-    # split into chunks
+    # split into chunks of [ length ]
     def split_chunks(l, n):
         for i in range(0, len(l), n):
             yield l[i:i + n]
@@ -28,27 +30,27 @@ def compute(raw_data:bytes, length=256,iterations=1,seed=0):
 
     chunks = list(split_chunks(data,length))
 
+    # Sponge Function absorb, squeeze
     np.random.seed(seed)
     state = bytearray(np.random.bytes(length // 8))
     for _ in range(iterations):
         for chunk in chunks:
             for index, _ in enumerate(state):
-                #tmp = state[index % len(state)]
-                #state[index % len(state)] = state[(index + 1) % len(state)]
-                #state[(index + 1) % len(state)] = tmp
                 state[index] = state[index] ^ state[(index - 1) % len(state)]
                 state[index] = state[index] ^ chunk[index]
     return format(state)
 
-def compute_state(seed, length):
+def compute_state(data, length, seed = 0):
+    for i in data:
+        seed = seed ^ i
     np.random.seed(seed)
-    return base64.b64encode(bytearray(np.random.bytes(length // 8)))
+    return bytearray(np.random.bytes(length // 8)).hex()
 
 if __name__ == "__main__":
     if not sys.stdin.isatty():
         data = sys.stdin.buffer.read()
         print(compute(data))
         exit()
-    # print(compute_state(6969,256))
+    print(compute_state("1Jedimaster".encode(), 256))
     data = input("Enter password for hash: ").encode()
     print(compute(data))
