@@ -4,9 +4,11 @@ import numpy as np
 import base64
 import sys
 
-def compute(raw_data:bytes, length=256,iterations=10,seed=1):
+def compute(raw_data:bytes, length=256,iterations=1,seed=0):
     data = list(raw_data)
     # padding
+    for i in data:
+        seed = seed ^ i
     if len(data) < length:
         t1 = length - len(data)
         data = data + [0] * t1
@@ -24,9 +26,7 @@ def compute(raw_data:bytes, length=256,iterations=10,seed=1):
     def format(input:bytearray):
         return f"$2b${hex(iterations)[2:]}${base64.b64encode(input).decode()}"
 
-    
     chunks = list(split_chunks(data,length))
-
 
     np.random.seed(seed)
     state = bytearray(np.random.bytes(length // 8))

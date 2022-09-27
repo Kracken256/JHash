@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import jhash
 import binascii
 import numpy as np
