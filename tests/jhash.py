@@ -4,12 +4,13 @@ import numpy as np
 import base64
 import sys
 
-def compute(raw_data:bytes, length=256,iterations=1,seed=0):
+
+def compute(raw_data: bytes, length=256, iterations=1, seed=0):
     data = list(raw_data)
     # Derterminitic seed generation
     for i in data:
         seed = seed ^ i
-    
+
     # padding
     if len(data) < length:
         t1 = length - len(data)
@@ -18,17 +19,17 @@ def compute(raw_data:bytes, length=256,iterations=1,seed=0):
         t1 = len(data) % length
         if t1 != 0:
             data = data + [0] * (length - t1)
-    
+
     # split into chunks of [ length ]
     def split_chunks(l, n):
         for i in range(0, len(l), n):
             yield l[i:i + n]
 
-    #Format hash
-    def format(input:bytearray):
+    # Format hash
+    def format(input: bytearray):
         return f"$2b${hex(iterations)[2:]}${base64.b64encode(input).decode()}"
 
-    chunks = list(split_chunks(data,length))
+    chunks = list(split_chunks(data, length))
 
     # Sponge Function absorb, squeeze
     np.random.seed(seed)
@@ -40,11 +41,13 @@ def compute(raw_data:bytes, length=256,iterations=1,seed=0):
                 state[index] = state[index] ^ chunk[index]
     return format(state)
 
-def compute_state(data, length, seed = 0):
+
+def compute_state(data, length, seed=0):
     for i in data:
         seed = seed ^ i
     np.random.seed(seed)
     return bytearray(np.random.bytes(length // 8)).hex()
+
 
 if __name__ == "__main__":
     if not sys.stdin.isatty():
