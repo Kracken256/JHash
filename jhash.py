@@ -96,11 +96,26 @@ if __name__ == "__main__":
                 seed = int(seed)
         if "--iter" in args:
             iterations = int(args[args.index("--iter")+1])
-        
         if "--compute-state" in args:
             print(compute_state(data,length,seed))
         else:
             print(compute(data, length, iterations, seed))
         exit()
+    length = 256
+    seed = 0
+    iterations = 1
+    if "--length" in args:
+        length = int(args[args.index("--length")+1])
+    if "--seed" in args:
+        seed = args[args.index("--seed")+1]
+        if not seed.isnumeric():
+            tmp = 0
+            for i in list(seed):
+                tmp += ord(i)
+            seed = tmp
+        else:
+            seed = int(seed)
+    if "--iter" in args:
+        iterations = int(args[args.index("--iter")+1])
     data = input("Enter data to digest: ").encode()
-    print(compute(data))
+    print(compute(data, length, iterations,seed))
