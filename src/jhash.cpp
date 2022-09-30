@@ -144,7 +144,7 @@ namespace jhash
             {
                 for (int k = 0; k < length; k++)
                 {
-                    initial_state[k] = initial_state[k] ^ initial_state[(k - 1) % length];
+                    //initial_state[k] = initial_state[k] ^ initial_state[(k - 1) % length];
                     initial_state[k] = initial_state[k] ^ chunks[j][k];
                 }
             }
