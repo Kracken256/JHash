@@ -111,7 +111,7 @@ std::string format_hash(std::string hash, int iterations)
     std::stringstream sstream;
     sstream << std::hex << iterations;
     std::string iter_in_hex = sstream.str();
-    std::string output = "$2b$" + iter_in_hex + "$" + Encode(hash);
+    std::string output = "$2c$" + iter_in_hex + "$" + Encode(hash);
     return output;
 }
 
