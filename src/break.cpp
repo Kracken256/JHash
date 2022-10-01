@@ -43,18 +43,39 @@ void read_table(vector<string> &v, int length)
     }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-    int length = 32;
-    
+    std::vector<std::string> args(argv + 1, argv + argc);
+    int length = 64;
+
     std::vector<std::string> table;
-    for (int i = 0; i < 3000000; i++) {
-        std::string state = jhash::createRandByteArray(32,i);
-        table.push_back(state);
-    }
-    write_to_table(table);
-    
     string test_input = "Secret{12d271e0de6a164}";
+    for (int i = 0; i < args.size(); i++)
+    {
+        if (args[i] == "--generate-table")
+        {
+            printf("Generating table...\n");
+            for (int i = 0; i < 3000000; i++)
+            {
+                std::string state = jhash::createRandByteArray(length, i);
+                table.push_back(state);
+            }
+            write_to_table(table);
+            printf("Done.\n");
+            return 0;
+        }
+        if (args[i] == "--input")
+        {
+            if (args.size() > i+1)
+            {
+                test_input = string(args[i + 1]);
+            } else {
+                printf("Please specify input.\n");
+                return 0;
+            }
+        }
+    }
+
     read_table(table, length);
     string hash = jhash::compute_hash(test_input, length, 1, 0);
     for (int i = 0; i < table.size(); i++)
@@ -66,7 +87,9 @@ int main()
         }
         if (initial_state.rfind(test_input, 0) == 0)
         {
-            printf("Pass!! Here is the password:\n");
+            printf(jhash::chars_to_hex(table[i]).c_str());
+            printf("\n");
+            printf("Cracked!! Here is the password:\n");
             printf(initial_state.c_str());
             return 0;
         }

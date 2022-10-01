@@ -20,13 +20,13 @@ namespace jhash
         return output;
     }
 
-    static std::string createRandByteArray(int size, int64_t seed)
+    static std::string createRandByteArray(int size, int seed)
     {
         std::string pt;
-        std::mt19937_64 gen(seed);
+        std::mt19937 gen(seed);
         for (int i = 0; i < size; i++)
         {
-            pt = pt + (char)(((int)gen()) % 256);
+            pt = pt + (char)((gen()) % 256);
         }
         return pt;
     }
@@ -144,7 +144,7 @@ namespace jhash
             {
                 for (int k = 0; k < length; k++)
                 {
-                    //initial_state[k] = initial_state[k] ^ initial_state[(k - 1) % length];
+                    // initial_state[k] = initial_state[k] ^ initial_state[(k - 1) % length];
                     initial_state[k] = initial_state[k] ^ chunks[j][k];
                 }
             }

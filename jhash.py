@@ -3,6 +3,11 @@
 import numpy as np
 import base64
 import sys
+import MT19937
+
+def get_random_bytes(number_of_bytes: int, seed: int):
+    np.random.seed(seed)
+    return bytearray(np.random.bytes(number_of_bytes))
 
 
 def compute(raw_data: bytes, length=256, iterations=1, seed=0):
@@ -16,7 +21,7 @@ def compute(raw_data: bytes, length=256, iterations=1, seed=0):
         if seed > (2**32 - 1):
             seed = seed % (2**32 - 1)
         return seed
-    seed = compute_seed(data,length,seed)
+    seed = compute_seed(data, length, seed)
 
     # padding
     if len(data) < length:
@@ -36,14 +41,15 @@ def compute(raw_data: bytes, length=256, iterations=1, seed=0):
     def format(input: bytearray):
         # Encoding format v1
         def encode(data):
-            return base64.urlsafe_b64encode(data).decode().replace("=", "")
+            return base64.b64encode(data).decode()
         return f"$2b${hex(iterations)[2:]}${encode(input)}"
 
     chunks = list(split_chunks(data, length))
 
     # Sponge Function absorb, squeeze
-    np.random.seed(seed)
-    state = bytearray(np.random.bytes(length // 8))
+    # np.random.seed(seed)
+    # state = bytearray(np.random.bytes(length // 8))
+    state = bytearray(get_random_bytes(length // 8, seed))
     len_of_state = range(len(state))
     for _ in range(iterations):
         for chunk in chunks:
@@ -63,6 +69,8 @@ def compute_state(data, length=256, seed=0):
         seed = seed % (2**32 - 1)
     np.random.seed(seed)
     return bytearray(np.random.bytes(length // 8)).hex()
+    #return bytearray(get_random_bytes(length, seed)).hex()
+
 
 if __name__ == "__main__":
     def print_help():
@@ -97,7 +105,7 @@ if __name__ == "__main__":
         if "--iter" in args:
             iterations = int(args[args.index("--iter")+1])
         if "--compute-state" in args:
-            print(compute_state(data,length,seed))
+            print(compute_state(data, length, seed))
         else:
             print(compute(data, length, iterations, seed))
         exit()
@@ -118,4 +126,4 @@ if __name__ == "__main__":
     if "--iter" in args:
         iterations = int(args[args.index("--iter")+1])
     data = input("Enter data to digest: ").encode()
-    print(compute(data, length, iterations,seed))
+    print(compute(data, length, iterations, seed))
